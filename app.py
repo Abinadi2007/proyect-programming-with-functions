@@ -1,10 +1,10 @@
-from flask import Flask, request, render_template, send_file
+from flask import Flask, request, render_template, send_file, redirect, url_for
 import csv
 import os
 
 app = Flask(__name__)
 
-DIRECTORY = r'/home/JosephJimenez07/mysite'
+DIRECTORY = r'/home/JosephJimenez07/mysite'  # Ensure this path is correct
 
 class Expense:
     def __init__(self, date, amount, category):
@@ -40,27 +40,34 @@ class ExpenseTracker:
 
 expense_tracker = ExpenseTracker()
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/add_expense', methods=['POST'])
 def add_expense():
     date = request.form['date']
     amount = float(request.form['amount'])
     category = request.form['category']
-    print(f"Adding expense: {date}, {amount}, {category}")  # Debugging output
     expense = Expense(date, amount, category)
     expense_tracker.add_expense(expense)
-    return "Expense added successfully!"
+    return render_template('expense_added.html')
 
 @app.route('/export', methods=['POST'])
 def export_data():
     format = request.form['format']
-    print(f"Exporting data in format: {format}")  # Debugging output
     if format == 'csv':
         file_path = expense_tracker.export_to_csv()
     elif format == 'txt':
         file_path = expense_tracker.export_to_txt()
     else:
         return "Unsupported format", 400
-    print(f"File path: {file_path}")  # Debugging output
+    filename = os.path.basename(file_path)
+    return render_template('export_data.html', filename=filename)
+
+@app.route('/download/<filename>')
+def download_file(filename):
+    file_path = os.path.join(DIRECTORY, filename)
     return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
