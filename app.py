@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-DIRECTORY = r'/home/yourusername/your-flask-app'
+DIRECTORY = r'/home/JosephJimenez07/mysite'
 
 class Expense:
     def __init__(self, date, amount, category):
