@@ -40,15 +40,12 @@ class ExpenseTracker:
 
 expense_tracker = ExpenseTracker()
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
 @app.route('/add_expense', methods=['POST'])
 def add_expense():
     date = request.form['date']
     amount = float(request.form['amount'])
     category = request.form['category']
+    print(f"Adding expense: {date}, {amount}, {category}")  # Debugging output
     expense = Expense(date, amount, category)
     expense_tracker.add_expense(expense)
     return "Expense added successfully!"
@@ -56,12 +53,14 @@ def add_expense():
 @app.route('/export', methods=['POST'])
 def export_data():
     format = request.form['format']
+    print(f"Exporting data in format: {format}")  # Debugging output
     if format == 'csv':
         file_path = expense_tracker.export_to_csv()
     elif format == 'txt':
         file_path = expense_tracker.export_to_txt()
     else:
         return "Unsupported format", 400
+    print(f"File path: {file_path}")  # Debugging output
     return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
